@@ -1,0 +1,19 @@
+[package]
+name = "serve-upvote"
+version = "0.0.1"
+edition = "2021"
+license = "Apache-2.0 OR MIT"
+
+[dependencies]
+actix-web = "^4"
+actix-web-httpauth = "0.8.2"
+clap = { version = "^4.5", features = ["derive", "env"] }
+diesel = { version = "^2.2", features = ["postgres"] }
+dotenvy = "^0.15"
+env_logger = "^0.11"
+indexmap = "^2.6"
+#rust-actix-diesel-auth-scaffold = { path = "../rust-actix-diesel-auth-scaffold" }
+rust-actix-diesel-auth-scaffold = { git = "https://github.com/offscale/rust-actix-diesel-auth-scaffold", version = "0.0.1" }
+serde = { version = "^1", features = ["derive"] }
+#upvote-backend = { path = "../upvote-backend" }
+upvote-backend = { git = "https://github.com/upvote-dev/upvote-backend", version = "0.0.1" }
