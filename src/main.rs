@@ -79,6 +79,15 @@ async fn main() -> std::io::Result<()> {
 
     actix_web::HttpServer::new(move || {
         actix_web::App::new()
+            .app_data(actix_web::web::JsonConfig::default().error_handler(|err, _req| {
+                actix_web::error::InternalError::from_response(
+                    "",
+                    actix_web::HttpResponse::BadRequest()
+                        .content_type("application/json")
+                        .body(format!(r#"{{"error":"{}"}}"#, err)),
+                )
+                    .into()
+            }))
             .app_data(actix_web::web::Data::new(pool.clone()))
             .service(
                 actix_web::web::scope("/api/v0")
@@ -87,9 +96,9 @@ async fn main() -> std::io::Result<()> {
                             rust_actix_diesel_auth_scaffold::middleware::bearer::validator,
                         ),
                     ))
-                    .service(upvote_backend::routes::profile::create)
+                    .service(upvote_backend::routes::profile::upsert)
                     .service(upvote_backend::routes::profile::read)
-                    .service(upvote_backend::routes::review::create)
+                    .service(upvote_backend::routes::review::upsert)
                     .service(upvote_backend::routes::review::read),
             )
             .service(
@@ -109,7 +118,7 @@ async fn main() -> std::io::Result<()> {
                     .service(rust_actix_diesel_auth_scaffold::routes::logout::logout),
             )
     })
-    .bind((args.hostname.as_str(), args.port))?
-    .run()
-    .await
+        .bind((args.hostname.as_str(), args.port))?
+        .run()
+        .await
 }

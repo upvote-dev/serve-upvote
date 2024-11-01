@@ -75,7 +75,7 @@ Add an `.env` file or otherwise add these environment variables; replacing conne
 
 #### `--help`
 
-    Usage: serve-actix-diesel-auth-scaffold [OPTIONS]
+    Usage: serve-upvote [OPTIONS]
     
     Options:
           --hostname <HOSTNAME>  Hostname [env: SADAS_HOSTNAME=] [default: localhost]
