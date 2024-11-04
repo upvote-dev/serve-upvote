@@ -91,6 +91,10 @@ async fn main() -> std::io::Result<()> {
             .app_data(actix_web::web::Data::new(pool.clone()))
             .service(
                 actix_web::web::scope("/api/v0")
+                    .service(upvote_backend::routes::review::read_many),
+            )
+            .service(
+                actix_web::web::scope("/api/v0")
                     .wrap(actix_web::middleware::Compat::new(
                         actix_web_httpauth::middleware::HttpAuthentication::bearer(
                             rust_actix_diesel_auth_scaffold::middleware::bearer::validator,
