@@ -90,7 +90,7 @@ async fn main() -> std::io::Result<()> {
             }))
             .app_data(actix_web::web::Data::new(pool.clone()))
             .service(
-                actix_web::web::scope("/api/v0")
+                actix_web::web::scope("/api/v0_noauth")
                     .service(upvote_backend::routes::review::read_many),
             )
             .service(
