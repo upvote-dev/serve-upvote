@@ -25,6 +25,8 @@ struct Cli {
 #[derive(serde::Serialize)]
 struct Version {
     version: String,
+    upvote_backend: String,
+    radas: String,
     name: String,
 }
 
@@ -32,6 +34,8 @@ impl Default for Version {
     fn default() -> Self {
         Self {
             version: String::from(env!("CARGO_PKG_VERSION")),
+            radas: String::from(rust_actix_diesel_auth_scaffold::CARGO_PKG_VERSION),
+            upvote_backend: String::from(upvote_backend::CARGO_PKG_VERSION),
             name: String::from(env!("CARGO_PKG_NAME")),
         }
     }
@@ -39,10 +43,7 @@ impl Default for Version {
 
 #[actix_web::get("")]
 async fn version() -> actix_web::web::Json<Version> {
-    actix_web::web::Json(Version {
-        version: String::from(env!("CARGO_PKG_VERSION")),
-        name: String::from(env!("CARGO_PKG_NAME")),
-    })
+    actix_web::web::Json(Version::default())
 }
 
 #[actix_web::main]
@@ -73,21 +74,24 @@ async fn main() -> std::io::Result<()> {
     let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL must be set");
 
     rust_actix_diesel_auth_scaffold::db_init();
+    upvote_backend::db_init();
 
     let manager = diesel::r2d2::ConnectionManager::<diesel::PgConnection>::new(database_url);
     let pool = diesel::r2d2::Pool::builder().build(manager).unwrap();
 
     actix_web::HttpServer::new(move || {
         actix_web::App::new()
-            .app_data(actix_web::web::JsonConfig::default().error_handler(|err, _req| {
-                actix_web::error::InternalError::from_response(
-                    "",
-                    actix_web::HttpResponse::BadRequest()
-                        .content_type("application/json")
-                        .body(format!(r#"{{"error":"{}"}}"#, err)),
-                )
+            .app_data(
+                actix_web::web::JsonConfig::default().error_handler(|err, _req| {
+                    actix_web::error::InternalError::from_response(
+                        "",
+                        actix_web::HttpResponse::BadRequest()
+                            .content_type("application/json")
+                            .body(format!(r#"{{"error":"{}"}}"#, err)),
+                    )
                     .into()
-            }))
+                }),
+            )
             .app_data(actix_web::web::Data::new(pool.clone()))
             .service(
                 actix_web::web::scope("/api/v0_noauth")
@@ -122,7 +126,7 @@ async fn main() -> std::io::Result<()> {
                     .service(rust_actix_diesel_auth_scaffold::routes::logout::logout),
             )
     })
-        .bind((args.hostname.as_str(), args.port))?
-        .run()
-        .await
+    .bind((args.hostname.as_str(), args.port))?
+    .run()
+    .await
 }

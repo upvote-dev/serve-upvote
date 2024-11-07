@@ -4,13 +4,16 @@ serve-upvote
 
 Server entrypoint for auth, `Review`s, `Profile`s, and more.
 
-Backend implementation to be found at child repository: https://github.com/upvote-dev/upvote-backend (clone this one directory above to build)
+Backend implementation to be found at child repository: https://github.com/upvote-dev/upvote-backend (clone this one
+directory above to build)
 
 ## Why
 
-Honestly everything else is too complicated. When you just want some access tokens and to get started real quick, this is what you need.
+Honestly everything else is too complicated. When you just want some access tokens and to get started real quick, this
+is what you need.
 
 Once the server is up—setup/usage notes follow—you can just:
+
 ```sh
 $ curl -X POST http://localhost:3000/api/token \
        -H 'Content-Type: application/json' \
@@ -19,11 +22,12 @@ $ curl -X POST http://localhost:3000/api/token \
 ```
 
 Which—registering user if nonexistent—returns of the form:
+
 ```json
 {
-    "access_token": "user::regular::access_token::4151d642-eb27-4064-b87c-e3d2bfa10435",
-    "token_type": "Bearer",
-    "expires_in": 3600
+  "access_token": "user::regular::access_token::4151d642-eb27-4064-b87c-e3d2bfa10435",
+  "token_type": "Bearer",
+  "expires_in": 3600
 }
 ```
 
@@ -34,14 +38,18 @@ $ curl http://localhost:3000/secured/secret \
        -H 'Authorization: Bearer user::regular::access_token::4151d642-eb27-4064-b87c-e3d2bfa10435'
 ```
 
+See [src/main.rs](src/main.rs) for current routes. Will expose OpenAPI docs and generate docs for it soon.
+
 ## Docker usage
 
 Install Docker, and then run the following, which will make a server available at http://localhost:3000:
+
 ```sh
 $ docker compose up
 ````
 
 NOTE: You may need to configure this for your architecture first, for example:
+
 ```sh
 $ docker compose build --build-arg ARCH_VARIANT='amd64' \
                        --build-arg ARCH='x86_64'
@@ -49,6 +57,7 @@ $ docker compose up
 ```
 
 Or to work with just one image and provide your own database and redis:
+
 ```sh
 $ docker build -f 'debian.Dockerfile' -t "${PWD##*/}"':latest' .
 $ docker run -e DATABASE_URL="$RDBMS_URI" \
@@ -87,18 +96,23 @@ Add an `.env` file or otherwise add these environment variables; replacing conne
       -V, --version              Print version
 
 ## Contribution guide
-Ensure all tests are passing [`cargo test`](https://doc.rust-lang.org/cargo/commands/cargo-test.html) and [`rustfmt`](https://github.com/rust-lang/rustfmt) has been run. This can be with [`cargo make`](https://github.com/sagiegurari/cargo-make); installable with:
+
+Ensure all tests are passing [`cargo test`](https://doc.rust-lang.org/cargo/commands/cargo-test.html) and [
+`rustfmt`](https://github.com/rust-lang/rustfmt) has been run. This can be with [
+`cargo make`](https://github.com/sagiegurari/cargo-make); installable with:
 
 ```sh
 $ cargo install --force cargo-make
 ```
 
 Then run:
+
 ```sh
 $ cargo make
 ```
 
-Finally, we recommend [feature-branches](https://martinfowler.com/bliki/FeatureBranch.html) with an accompanying [pull-request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests).
+Finally, we recommend [feature-branches](https://martinfowler.com/bliki/FeatureBranch.html) with an
+accompanying [pull-request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests).
 </small>
 
 <hr/>
