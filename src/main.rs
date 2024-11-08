@@ -1,3 +1,9 @@
+#[cfg(test)]
+mod tests;
+
+pub const CARGO_PKG_VERSION: &'static str = env!("CARGO_PKG_VERSION");
+pub const CARGO_PKG_NAME: &'static str = env!("CARGO_PKG_NAME");
+
 #[derive(clap::Parser)]
 #[command(version, about, long_about = None)]
 struct Cli {
@@ -22,28 +28,36 @@ struct Cli {
     env: Option<Vec<String>>,
 }
 
-#[derive(serde::Serialize)]
+#[derive(serde::Deserialize, serde::Serialize, Debug, PartialEq)]
 struct Version {
-    version: String,
-    upvote_backend: String,
-    radas: String,
-    name: String,
+    version: &'static str,
+    upvote_backend: &'static str,
+    radas: &'static str,
+    name: &'static str,
 }
 
 impl Default for Version {
     fn default() -> Self {
+        Self::const_default()
+    }
+}
+
+impl Version {
+    const fn const_default() -> Self {
         Self {
-            version: String::from(env!("CARGO_PKG_VERSION")),
-            radas: String::from(rust_actix_diesel_auth_scaffold::CARGO_PKG_VERSION),
-            upvote_backend: String::from(upvote_backend::CARGO_PKG_VERSION),
-            name: String::from(env!("CARGO_PKG_NAME")),
+            version: CARGO_PKG_VERSION,
+            radas: rust_actix_diesel_auth_scaffold::CARGO_PKG_VERSION,
+            upvote_backend: upvote_backend::CARGO_PKG_VERSION,
+            name: CARGO_PKG_NAME,
         }
     }
 }
 
+const VERSION: Version = Version::const_default();
+
 #[actix_web::get("")]
 async fn version() -> actix_web::web::Json<Version> {
-    actix_web::web::Json(Version::default())
+    actix_web::web::Json(VERSION)
 }
 
 #[actix_web::main]

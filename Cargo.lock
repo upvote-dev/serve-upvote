@@ -1829,6 +1829,7 @@ dependencies = [
  "indexmap",
  "rust-actix-diesel-auth-scaffold",
  "serde",
+ "serde_json",
  "upvote-backend",
 ]
 

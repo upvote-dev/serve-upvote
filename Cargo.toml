@@ -15,5 +15,6 @@ indexmap = "^2.6"
 #rust-actix-diesel-auth-scaffold = { path = "../rust-actix-diesel-auth-scaffold" }
 rust-actix-diesel-auth-scaffold = { git = "https://github.com/offscale/rust-actix-diesel-auth-scaffold", version = "0.0.1" }
 serde = { version = "^1", features = ["derive"] }
+serde_json = "^1"
 #upvote-backend = { path = "../upvote-backend" }
 upvote-backend = { git = "https://github.com/upvote-dev/upvote-backend", version = "0.0.1" }
