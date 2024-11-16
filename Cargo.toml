@@ -13,12 +13,12 @@ diesel = { version = "^2.2", features = ["postgres"] }
 dotenvy = "^0.15"
 env_logger = "^0.11"
 indexmap = "^2.6"
-rust-actix-diesel-auth-scaffold = { path = "../rust-actix-diesel-auth-scaffold" }
-#rust-actix-diesel-auth-scaffold = { git = "https://github.com/offscale/rust-actix-diesel-auth-scaffold", version = "0.0.1" }
+#rust-actix-diesel-auth-scaffold = { path = "../rust-actix-diesel-auth-scaffold" }
+rust-actix-diesel-auth-scaffold = { git = "https://github.com/offscale/rust-actix-diesel-auth-scaffold", version = "0.0.1" }
 serde = { version = "^1", features = ["derive"] }
 serde_json = "^1"
-upvote-backend = { path = "../upvote-backend" }
-#upvote-backend = { git = "https://github.com/upvote-dev/upvote-backend", version = "0.0.1" }
+#upvote-backend = { path = "../upvote-backend" }
+upvote-backend = { git = "https://github.com/upvote-dev/upvote-backend", version = "0.0.1" }
 utoipa = { version = "5.2.0", features = ["actix_extras"] }
 utoipa-actix-web = "0.1.2"
 utoipa-rapidoc = { version = "5.0.0", features = ["actix-web"] }

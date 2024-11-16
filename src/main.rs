@@ -1,3 +1,4 @@
+use actix_web::get;
 use utoipa::{Modify, OpenApi};
 use utoipa_actix_web::AppExt;
 use utoipa_redoc::Servable;
@@ -61,7 +62,8 @@ impl Version {
 
 const VERSION: Version = Version::const_default();
 
-#[actix_web::get("")]
+#[utoipa::path()]
+#[get("")]
 async fn version() -> actix_web::web::Json<Version> {
     actix_web::web::Json(VERSION)
 }
@@ -163,9 +165,9 @@ async fn main() -> std::io::Result<()> {
             )
             .service(
                 utoipa_actix_web::scope("/api")
-                    .service(rust_actix_diesel_auth_scaffold::routes::token::token),
-                // .service(rust_actix_diesel_auth_scaffold::routes::authorisation::authorise)
-                // .service(version),
+                    .service(rust_actix_diesel_auth_scaffold::routes::token::token)
+                    //  .service(rust_actix_diesel_auth_scaffold::routes::authorisation::authorise)
+                    .service(version),
             )
             .service(
                 utoipa_actix_web::scope("/secured")
