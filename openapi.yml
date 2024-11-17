@@ -1,0 +1,266 @@
+components:
+
+  schemas:
+
+    NewProfileJ:
+      description: Create a new Profile with this record
+      properties:
+        alias:
+          description: Optional alias (if set, this is publicly used instead of username)
+          example:
+          type:
+            - string
+            - 'null'
+        coins:
+          description: Optional starting coin amount
+          example: 0
+          format: int32
+          type:
+            - integer
+            - 'null'
+        profile_image_url:
+          description: Optional image URL to avatar associated with this profile
+          example:
+          type:
+            - string
+            - 'null'
+        rank:
+          description: Optional rank (TBD rank ontology)
+          example:
+          type:
+            - string
+            - 'null'
+        username:
+          description: Optional username (regardless of whether set uses username from access token)
+          example: DEFAULT_USERNAME
+          type: string
+      type: object
+
+    NewReviewJ:
+
+      description: Create a new Review with this record
+
+      properties:
+        message:
+          description: Optional free-text review
+          example:
+          type:
+            - string
+            - 'null'
+        photo_url:
+          description: Optional image URL to photo of reviewee
+          example:
+          type:
+            - string
+            - 'null'
+        reviewee:
+          description: Unique identifier to object being reviewed
+          example: item0_barcode
+          type: string
+        reviewee_kind:
+          description: Type of object being reviewed
+          example: product
+          type: string
+        username:
+          description: Optional username (regardless of whether set uses username from access token)
+          example:
+          type:
+            - string
+            - 'null'
+        video_url:
+          description: Optional video URL to video of reviewee
+          example:
+          type:
+            - string
+            - 'null'
+        vote:
+          description: Appraisal (e.g., `-1` is downvote, `1` is upvote)
+          example: 1
+          format: int32
+          type: integer
+
+      required:
+        - reviewee
+        - reviewee_kind
+        - vote
+
+      type: object
+
+    TokenRequest:
+      properties:
+        client_id:
+          description: optional client ID (as used, for example, in RFC6749's non password non refresh
+            grant flow)
+          example:
+          type:
+            - string
+            - 'null'
+        client_secret:
+          description: optional client secret (as used, e.g., in RFC6749's non (password|refresh) grant
+            flow)
+          example:
+          type:
+            - string
+            - 'null'
+        grant_type:
+          description: RFC6749 grant type
+          example: password
+          type: string
+        password:
+          description: optional password (as used, for example, in RFC6749's password grant flow)
+          example: pass0
+          type:
+            - string
+            - 'null'
+        username:
+          description: optional username (as used, for example, in RFC6749's password grant flow)
+          example: user0
+          type:
+            - string
+            - 'null'
+      required:
+        - grant_type
+      type: object
+
+  securitySchemes:
+    password:
+      flows:
+        password:
+          scopes: {}
+          tokenUrl: /api/token
+      type: oauth2
+
+info:
+  description: Upvote endpoints
+  license:
+    name: ''
+  title: serve-upvote
+  version: 0.0.1
+
+openapi: 3.1.0
+
+paths:
+
+  /api:
+    get:
+      operationId: version
+      responses: {}
+      summary: Versions of this package and its first-party dependencies
+
+  /api/token:
+    post:
+      operationId: token
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenRequest'
+        required: true
+      responses:
+        '200':
+          description: Token created
+        '400':
+          description: Unauthorized User
+        '404':
+          description: Not Found User
+        '500':
+          description: Bad Request
+      summary: Generate a token for a grant flow
+
+  /api/v0/profile:
+    get:
+      operationId: read
+      responses:
+        '200':
+          description: Profile for user associated with access token
+        '404':
+          description: 'Not found: User does not have associated profile'
+      security:
+        - password: []
+      summary: Get profile
+    post:
+      operationId: upsert
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewProfileJ'
+        required: true
+      responses:
+        '200':
+          description: Profile created
+        '401':
+          description: 'Unauthorised: You tried to create a profile for another user'
+      security:
+        - password: []
+      summary: Upsert Profile
+
+  /api/v0/review:
+    post:
+      operationId: upsert
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewReviewJ'
+        required: true
+      responses:
+        '200':
+          description: Review created
+        '500':
+          description: Internal Server Error
+      security:
+        - password: []
+      summary: Upsert Review
+
+  /api/v0/review/{id}:
+    get:
+      operationId: read
+      parameters:
+        - description: Review id
+          in: path
+          name: id
+          required: true
+          schema:
+            format: int32
+            type: integer
+      responses:
+        '200':
+          description: Review found from database
+        '404':
+          description: Not found
+      summary: Get Review by id
+
+  /api/v0_noauth/reviews:
+    get:
+      operationId: read_many
+      responses:
+        '200':
+          description: Reviews found in database
+        '404':
+          description: Not found
+      summary: Get Reviews
+
+  /secured/logout:
+    post:
+      operationId: logout
+      responses:
+        '200':
+          description: ''
+      security:
+        - password: []
+      summary: Logout a user (uses provided Bearer token from Header)
+
+  /secured/secret:
+    get:
+      operationId: secret
+      responses:
+        '200':
+          description: secret endpoint
+      security:
+        - password: []
+      summary: Shows secret to authenticated user (uses provided Bearer token from Header)
+
+tags:
+  - description: Upvote endpoints
+    name: serve-upvote

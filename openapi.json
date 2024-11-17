@@ -1,0 +1,366 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "serve-upvote",
+    "description": "Upvote endpoints",
+    "license": {
+      "name": ""
+    },
+    "version": "0.0.1"
+  },
+  "paths": {
+    "/api": {
+      "get": {
+        "summary": "Versions of this package and its first-party dependencies",
+        "operationId": "version",
+        "responses": {}
+      }
+    },
+    "/api/token": {
+      "post": {
+        "summary": "Generate a token for a grant flow",
+        "operationId": "token",
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/TokenRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Token created"
+          },
+          "400": {
+            "description": "Unauthorized User"
+          },
+          "404": {
+            "description": "Not Found User"
+          },
+          "500": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/api/v0/profile": {
+      "get": {
+        "summary": "Get profile",
+        "operationId": "read",
+        "responses": {
+          "200": {
+            "description": "Profile for user associated with access token"
+          },
+          "404": {
+            "description": "Not found: User does not have associated profile"
+          }
+        },
+        "security": [
+          {
+            "password": []
+          }
+        ]
+      },
+      "post": {
+        "summary": "Upsert Profile",
+        "operationId": "upsert",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewProfileJ"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Profile created"
+          },
+          "401": {
+            "description": "Unauthorised: You tried to create a profile for another user"
+          }
+        },
+        "security": [
+          {
+            "password": []
+          }
+        ]
+      }
+    },
+    "/api/v0/review": {
+      "post": {
+        "summary": "Upsert Review",
+        "operationId": "upsert",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewReviewJ"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Review created"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "password": []
+          }
+        ]
+      }
+    },
+    "/api/v0/review/{id}": {
+      "get": {
+        "summary": "Get Review by id",
+        "operationId": "read",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Review id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Review found from database"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      }
+    },
+    "/api/v0_noauth/reviews": {
+      "get": {
+        "summary": "Get Reviews",
+        "operationId": "read_many",
+        "responses": {
+          "200": {
+            "description": "Reviews found in database"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      }
+    },
+    "/secured/logout": {
+      "post": {
+        "summary": "Logout a user (uses provided Bearer token from Header)",
+        "operationId": "logout",
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "password": []
+          }
+        ]
+      }
+    },
+    "/secured/secret": {
+      "get": {
+        "summary": "Shows secret to authenticated user (uses provided Bearer token from Header)",
+        "operationId": "secret",
+        "responses": {
+          "200": {
+            "description": "secret endpoint"
+          }
+        },
+        "security": [
+          {
+            "password": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "NewProfileJ": {
+        "type": "object",
+        "description": "Create a new Profile with this record",
+        "properties": {
+          "alias": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Optional alias (if set, this is publicly used instead of username)",
+            "example": null
+          },
+          "coins": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Optional starting coin amount",
+            "example": 0
+          },
+          "profile_image_url": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Optional image URL to avatar associated with this profile",
+            "example": null
+          },
+          "rank": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Optional rank (TBD rank ontology)",
+            "example": null
+          },
+          "username": {
+            "type": "string",
+            "description": "Optional username (regardless of whether set uses username from access token)",
+            "example": "DEFAULT_USERNAME"
+          }
+        }
+      },
+      "NewReviewJ": {
+        "type": "object",
+        "description": "Create a new Review with this record",
+        "required": [
+          "reviewee",
+          "reviewee_kind",
+          "vote"
+        ],
+        "properties": {
+          "message": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Optional free-text review",
+            "example": null
+          },
+          "photo_url": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Optional image URL to photo of reviewee",
+            "example": null
+          },
+          "reviewee": {
+            "type": "string",
+            "description": "Unique identifier to object being reviewed",
+            "example": "item0_barcode"
+          },
+          "reviewee_kind": {
+            "type": "string",
+            "description": "Type of object being reviewed",
+            "example": "product"
+          },
+          "username": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Optional username (regardless of whether set uses username from access token)",
+            "example": null
+          },
+          "video_url": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Optional video URL to video of reviewee",
+            "example": null
+          },
+          "vote": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Appraisal (e.g., `-1` is downvote, `1` is upvote)",
+            "example": 1
+          }
+        }
+      },
+      "TokenRequest": {
+        "type": "object",
+        "required": [
+          "grant_type"
+        ],
+        "properties": {
+          "client_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "optional client ID (as used, for example, in RFC6749's non password non refresh grant flow)",
+            "example": null
+          },
+          "client_secret": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "optional client secret (as used, e.g., in RFC6749's non (password|refresh) grant flow)",
+            "example": null
+          },
+          "grant_type": {
+            "type": "string",
+            "description": "RFC6749 grant type",
+            "example": "password"
+          },
+          "password": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "optional password (as used, for example, in RFC6749's password grant flow)",
+            "example": "pass0"
+          },
+          "username": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "optional username (as used, for example, in RFC6749's password grant flow)",
+            "example": "user0"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "password": {
+        "type": "oauth2",
+        "flows": {
+          "password": {
+            "tokenUrl": "/api/token",
+            "scopes": {}
+          }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "serve-upvote",
+      "description": "Upvote endpoints"
+    }
+  ]
+}

@@ -1,3 +1,4 @@
+/// entrypoint that mounts all the routes and then runs the server
 use actix_web::get;
 use utoipa::{Modify, OpenApi};
 use utoipa_actix_web::AppExt;
@@ -41,7 +42,8 @@ const GET_CARGO_PKG_NAME: fn() -> &'static str = || CARGO_PKG_NAME;
 
 const GET_UPVOTE_BACKEND_PKG_VERSION: fn() -> &'static str = || upvote_backend::CARGO_PKG_VERSION;
 
-const GET_RADAS_PKG_VERSION: fn() -> &'static str = || rust_actix_diesel_auth_scaffold::CARGO_PKG_VERSION;
+const GET_RADAS_PKG_VERSION: fn() -> &'static str =
+    || rust_actix_diesel_auth_scaffold::CARGO_PKG_VERSION;
 
 /// Version record for this package and its first-party dependencies
 #[derive(serde::Deserialize, serde::Serialize, utoipa::ToSchema, Debug, PartialEq)]
