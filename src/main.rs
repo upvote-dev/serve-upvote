@@ -35,11 +35,31 @@ struct Cli {
     env: Option<Vec<String>>,
 }
 
+const GET_CARGO_PKG_VERSION: fn() -> &'static str = || CARGO_PKG_VERSION;
+
+const GET_CARGO_PKG_NAME: fn() -> &'static str = || CARGO_PKG_NAME;
+
+const GET_UPVOTE_BACKEND_PKG_VERSION: fn() -> &'static str = || upvote_backend::CARGO_PKG_VERSION;
+
+const GET_RADAS_PKG_VERSION: fn() -> &'static str = || rust_actix_diesel_auth_scaffold::CARGO_PKG_VERSION;
+
+/// Version record for this package and its first-party dependencies
 #[derive(serde::Deserialize, serde::Serialize, utoipa::ToSchema, Debug, PartialEq)]
 struct Version {
+    /// version of serve-upvote
+    #[schema(example = GET_CARGO_PKG_VERSION)]
     version: &'static str,
+
+    /// version of upvote-backend
+    #[schema(example = GET_UPVOTE_BACKEND_PKG_VERSION)]
     upvote_backend: &'static str,
+
+    /// version of rust-actix-diesel-auth-scaffold
+    #[schema(example = GET_RADAS_PKG_VERSION)]
     radas: &'static str,
+
+    /// name of this package
+    #[schema(example = GET_CARGO_PKG_NAME)]
     name: &'static str,
 }
 
@@ -62,6 +82,7 @@ impl Version {
 
 const VERSION: Version = Version::const_default();
 
+/// Versions of this package and its first-party dependencies
 #[utoipa::path()]
 #[get("")]
 async fn version() -> actix_web::web::Json<Version> {
@@ -103,9 +124,11 @@ async fn main() -> std::io::Result<()> {
 
     #[derive(utoipa::OpenApi)]
     #[openapi(
+        info(license(name="")),
         tags(
             (name = CARGO_PKG_NAME, description = CARGO_PKG_DESCRIPTION)
-        )
+        ),
+        modifiers(&SecurityAddon)
     )]
     struct ApiDoc;
 

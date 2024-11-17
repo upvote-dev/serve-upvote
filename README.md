@@ -67,6 +67,16 @@ $ docker run -e DATABASE_URL="$RDBMS_URI" \
              "${PWD##*/}"
 ```
 
+## Reverse proxy
+
+### Nginx
+
+Add this to your service block:
+
+    location ~* /(api|redoc|rapidoc) {
+        proxy_pass http://localhost:3000;
+    }
+
 ## Native usage
 
 Install Rust, `git`, and ensure you have your PostgreSQL and Redis/Valkey services setup.
